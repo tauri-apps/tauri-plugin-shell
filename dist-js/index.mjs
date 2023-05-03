@@ -12,14 +12,14 @@ import { invoke, transformCallback } from '@tauri-apps/api/tauri';
  * @returns A promise resolving to the process id.
  */
 async function execute(onEvent, program, args = [], options) {
-    if (typeof args === 'object') {
+    if (typeof args === "object") {
         Object.freeze(args);
     }
-    return invoke('plugin:shell|execute', {
+    return invoke("plugin:shell|execute", {
         program,
         args,
         options,
-        onEventFn: transformCallback(onEvent)
+        onEventFn: transformCallback(onEvent),
     });
 }
 /**
@@ -205,10 +205,10 @@ class Child {
      * @returns A promise indicating the success or failure of the operation.
      */
     async write(data) {
-        return invoke('plugin:shell|stdin_write', {
+        return invoke("plugin:shell|stdin_write", {
             pid: this.pid,
             // correctly serialize Uint8Arrays
-            buffer: typeof data === 'string' ? data : Array.from(data)
+            buffer: typeof data === "string" ? data : Array.from(data),
         });
     }
     /**
@@ -217,9 +217,9 @@ class Child {
      * @returns A promise indicating the success or failure of the operation.
      */
     async kill() {
-        return invoke('plugin:shell|kill', {
-            cmd: 'killChild',
-            pid: this.pid
+        return invoke("plugin:shell|kill", {
+            cmd: "killChild",
+            pid: this.pid,
         });
     }
 }
@@ -261,7 +261,7 @@ class Command extends EventEmitter {
         /** Event emitter for the `stderr`. Emits the `data` event. */
         this.stderr = new EventEmitter();
         this.program = program;
-        this.args = typeof args === 'string' ? [args] : args;
+        this.args = typeof args === "string" ? [args] : args;
         this.options = options !== null && options !== void 0 ? options : {};
     }
     /**
@@ -304,17 +304,17 @@ class Command extends EventEmitter {
     async spawn() {
         return execute((event) => {
             switch (event.event) {
-                case 'Error':
-                    this.emit('error', event.payload);
+                case "Error":
+                    this.emit("error", event.payload);
                     break;
-                case 'Terminated':
-                    this.emit('close', event.payload);
+                case "Terminated":
+                    this.emit("close", event.payload);
                     break;
-                case 'Stdout':
-                    this.stdout.emit('data', event.payload);
+                case "Stdout":
+                    this.stdout.emit("data", event.payload);
                     break;
-                case 'Stderr':
-                    this.stderr.emit('data', event.payload);
+                case "Stderr":
+                    this.stderr.emit("data", event.payload);
                     break;
             }
         }, this.program, this.args, this.options).then((pid) => new Child(pid));
@@ -335,21 +335,21 @@ class Command extends EventEmitter {
      */
     async execute() {
         return new Promise((resolve, reject) => {
-            this.on('error', reject);
+            this.on("error", reject);
             const stdout = [];
             const stderr = [];
-            this.stdout.on('data', (line) => {
+            this.stdout.on("data", (line) => {
                 stdout.push(line);
             });
-            this.stderr.on('data', (line) => {
+            this.stderr.on("data", (line) => {
                 stderr.push(line);
             });
-            this.on('close', (payload) => {
+            this.on("close", (payload) => {
                 resolve({
                     code: payload.code,
                     signal: payload.signal,
                     stdout: this.collectOutput(stdout),
-                    stderr: this.collectOutput(stderr)
+                    stderr: this.collectOutput(stderr),
                 });
             });
             this.spawn().catch(reject);
@@ -357,13 +357,13 @@ class Command extends EventEmitter {
     }
     /** @ignore */
     collectOutput(events) {
-        if (this.options.encoding === 'raw') {
+        if (this.options.encoding === "raw") {
             return events.reduce((p, c) => {
                 return new Uint8Array([...p, ...c, 10]);
             }, new Uint8Array());
         }
         else {
-            return events.join('\n');
+            return events.join("\n");
         }
     }
 }
@@ -394,9 +394,9 @@ class Command extends EventEmitter {
  * @since 1.0.0
  */
 async function open(path, openWith) {
-    return invoke('plugin:shell|open', {
+    return invoke("plugin:shell|open", {
         path,
-        with: openWith
+        with: openWith,
     });
 }
 

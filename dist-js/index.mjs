@@ -197,7 +197,7 @@ class Child {
      * @param data The message to write, either a string or a byte array.
      * @example
      * ```typescript
-     * import { Command } from 'tauri-plugin-shell-api';
+     * import { Command } from '@tauri-apps/plugin-shell';
      * const command = Command.create('node');
      * const child = await command.spawn();
      * await child.write('message');
@@ -230,7 +230,7 @@ class Child {
  * It emits the `close` and `error` events.
  * @example
  * ```typescript
- * import { Command } from 'tauri-plugin-shell-api';
+ * import { Command } from '@tauri-apps/plugin-shell';
  * const command = Command.create('node');
  * command.on('close', data => {
  *   console.log(`command finished with code ${data.code} and signal ${data.signal}`)
@@ -270,7 +270,7 @@ class Command extends EventEmitter {
      * Creates a command to execute the given program.
      * @example
      * ```typescript
-     * import { Command } from 'tauri-plugin-shell-api';
+     * import { Command } from '@tauri-apps/plugin-shell';
      * const command = Command.create('my-app', ['run', 'tauri']);
      * const output = await command.execute();
      * ```
@@ -285,7 +285,7 @@ class Command extends EventEmitter {
      * Creates a command to execute the given sidecar program.
      * @example
      * ```typescript
-     * import { Command } from 'tauri-plugin-shell-api';
+     * import { Command } from '@tauri-apps/plugin-shell';
      * const command = Command.sidecar('my-sidecar');
      * const output = await command.execute();
      * ```
@@ -325,7 +325,7 @@ class Command extends EventEmitter {
      * Executes the command as a child process, waiting for it to finish and collecting all of its output.
      * @example
      * ```typescript
-     * import { Command } from 'tauri-plugin-shell-api';
+     * import { Command } from '@tauri-apps/plugin-shell';
      * const output = await Command.create('echo', 'message').execute();
      * assert(output.code === 0);
      * assert(output.signal === null);
@@ -378,7 +378,7 @@ class Command extends EventEmitter {
  *
  * @example
  * ```typescript
- * import { open } from 'tauri-plugin-shell-api';
+ * import { open } from '@tauri-apps/plugin-shell';
  * // opens the given URL on the default browser:
  * await open('https://github.com/tauri-apps/tauri');
  * // opens the given URL using `firefox`:

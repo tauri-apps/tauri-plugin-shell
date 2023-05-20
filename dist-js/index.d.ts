@@ -188,7 +188,7 @@ declare class Command<O extends IOPayload> extends EventEmitter<CommandEvents> {
      * Creates a new `Command` instance.
      *
      * @param program The program name to execute.
-     * It must be configured on `tauri.conf.json > tauri > allowlist > shell > scope`.
+     * It must be configured on `tauri.conf.json > plugins > shell > scope`.
      * @param args Program arguments.
      * @param options Spawn options.
      */
@@ -257,7 +257,7 @@ type IOPayload = string | Uint8Array;
  * ```
  *
  * @param path The path or URL to open.
- * This value is matched against the string regex defined on `tauri.conf.json > tauri > allowlist > shell > open`,
+ * This value is matched against the string regex defined on `tauri.conf.json > plugins > shell > open`,
  * which defaults to `^((mailto:\w+)|(tel:\w+)|(https?://\w+)).+`.
  * @param openWith The app to open the file or URL with.
  * Defaults to the system default application for the specified path type.

@@ -1,6 +1,6 @@
-import { invoke, transformCallback } from '@tauri-apps/api/tauri';
-
 // Copyright 2019-2023 Tauri Programme within The Commons Conservancy
+// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 /**
  * Spawns a process.
  *
@@ -15,11 +15,11 @@ async function execute(onEvent, program, args = [], options) {
     if (typeof args === "object") {
         Object.freeze(args);
     }
-    return invoke("plugin:shell|execute", {
+    return window.__TAURI_INVOKE__("plugin:shell|execute", {
         program,
         args,
         options,
-        onEventFn: transformCallback(onEvent),
+        onEventFn: window.__TAURI__.transformCallback(onEvent),
     });
 }
 /**
@@ -207,7 +207,7 @@ class Child {
      * @returns A promise indicating the success or failure of the operation.
      */
     async write(data) {
-        return invoke("plugin:shell|stdin_write", {
+        return window.__TAURI_INVOKE__("plugin:shell|stdin_write", {
             pid: this.pid,
             // correctly serialize Uint8Arrays
             buffer: typeof data === "string" ? data : Array.from(data),
@@ -219,7 +219,7 @@ class Child {
      * @returns A promise indicating the success or failure of the operation.
      */
     async kill() {
-        return invoke("plugin:shell|kill", {
+        return window.__TAURI_INVOKE__("plugin:shell|kill", {
             cmd: "killChild",
             pid: this.pid,
         });
@@ -396,7 +396,7 @@ class Command extends EventEmitter {
  * @since 1.0.0
  */
 async function open(path, openWith) {
-    return invoke("plugin:shell|open", {
+    return window.__TAURI_INVOKE__("plugin:shell|open", {
         path,
         with: openWith,
     });

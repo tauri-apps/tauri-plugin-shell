@@ -10,6 +10,8 @@
  * @param args Program arguments.
  * @param options Configuration for the process spawn.
  * @returns A promise resolving to the process id.
+ *
+ * @since 2.0.0
  */
 async function execute(onEvent, program, args = [], options) {
     if (typeof args === "object") {
@@ -23,7 +25,7 @@ async function execute(onEvent, program, args = [], options) {
     });
 }
 /**
- * @since 1.0.0
+ * @since 2.0.0
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 class EventEmitter {
@@ -35,7 +37,7 @@ class EventEmitter {
     /**
      * Alias for `emitter.on(eventName, listener)`.
      *
-     * @since 1.1.0
+     * @since 2.0.0
      */
     addListener(eventName, listener) {
         return this.on(eventName, listener);
@@ -43,7 +45,7 @@ class EventEmitter {
     /**
      * Alias for `emitter.off(eventName, listener)`.
      *
-     * @since 1.1.0
+     * @since 2.0.0
      */
     removeListener(eventName, listener) {
         return this.off(eventName, listener);
@@ -56,7 +58,7 @@ class EventEmitter {
      *
      * Returns a reference to the `EventEmitter`, so that calls can be chained.
      *
-     * @since 1.0.0
+     * @since 2.0.0
      */
     on(eventName, listener) {
         if (eventName in this.eventListeners) {
@@ -75,7 +77,7 @@ class EventEmitter {
      *
      * Returns a reference to the `EventEmitter`, so that calls can be chained.
      *
-     * @since 1.1.0
+     * @since 2.0.0
      */
     once(eventName, listener) {
         const wrapper = (arg) => {
@@ -89,7 +91,7 @@ class EventEmitter {
      * Removes the all specified listener from the listener array for the event eventName
      * Returns a reference to the `EventEmitter`, so that calls can be chained.
      *
-     * @since 1.1.0
+     * @since 2.0.0
      */
     off(eventName, listener) {
         if (eventName in this.eventListeners) {
@@ -103,7 +105,7 @@ class EventEmitter {
      *
      * Returns a reference to the `EventEmitter`, so that calls can be chained.
      *
-     * @since 1.1.0
+     * @since 2.0.0
      */
     removeAllListeners(event) {
         if (event) {
@@ -122,6 +124,8 @@ class EventEmitter {
      * to each.
      *
      * @returns `true` if the event had listeners, `false` otherwise.
+     *
+     * @since 2.0.0
      */
     emit(eventName, arg) {
         if (eventName in this.eventListeners) {
@@ -137,7 +141,7 @@ class EventEmitter {
     /**
      * Returns the number of listeners listening to the event named `eventName`.
      *
-     * @since 1.1.0
+     * @since 2.0.0
      */
     listenerCount(eventName) {
         if (eventName in this.eventListeners)
@@ -153,7 +157,7 @@ class EventEmitter {
      *
      * Returns a reference to the `EventEmitter`, so that calls can be chained.
      *
-     * @since 1.1.0
+     * @since 2.0.0
      */
     prependListener(eventName, listener) {
         if (eventName in this.eventListeners) {
@@ -172,7 +176,7 @@ class EventEmitter {
      *
      * Returns a reference to the `EventEmitter`, so that calls can be chained.
      *
-     * @since 1.1.0
+     * @since 2.0.0
      */
     prependOnceListener(eventName, listener) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -185,7 +189,7 @@ class EventEmitter {
     }
 }
 /**
- * @since 1.1.0
+ * @since 2.0.0
  */
 class Child {
     constructor(pid) {
@@ -205,6 +209,8 @@ class Child {
      * ```
      *
      * @returns A promise indicating the success or failure of the operation.
+     *
+     * @since 2.0.0
      */
     async write(data) {
         return window.__TAURI_INVOKE__("plugin:shell|stdin_write", {
@@ -217,6 +223,8 @@ class Child {
      * Kills the child process.
      *
      * @returns A promise indicating the success or failure of the operation.
+     *
+     * @since 2.0.0
      */
     async kill() {
         return window.__TAURI_INVOKE__("plugin:shell|kill", {
@@ -243,7 +251,7 @@ class Child {
  * console.log('pid:', child.pid);
  * ```
  *
- * @since 1.1.0
+ * @since 2.0.0
  *
  */
 class Command extends EventEmitter {
@@ -302,6 +310,8 @@ class Command extends EventEmitter {
      * Executes the command as a child process, returning a handle to it.
      *
      * @returns A promise resolving to the child process handle.
+     *
+     * @since 2.0.0
      */
     async spawn() {
         return execute((event) => {
@@ -334,6 +344,8 @@ class Command extends EventEmitter {
      * ```
      *
      * @returns A promise resolving to the child process output.
+     *
+     * @since 2.0.0
      */
     async execute() {
         return new Promise((resolve, reject) => {
@@ -393,7 +405,7 @@ class Command extends EventEmitter {
  * @param openWith The app to open the file or URL with.
  * Defaults to the system default application for the specified path type.
  *
- * @since 1.0.0
+ * @since 2.0.0
  */
 async function open(path, openWith) {
     return window.__TAURI_INVOKE__("plugin:shell|open", {

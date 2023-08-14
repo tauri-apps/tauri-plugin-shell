@@ -1,27 +1,90 @@
+import { invoke, Channel } from '@tauri-apps/api/tauri';
+
 // Copyright 2019-2023 Tauri Programme within The Commons Conservancy
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
+/**
+ * Access the system shell.
+ * Allows you to spawn child processes and manage files and URLs using their default application.
+ *
+ * ## Security
+ *
+ * This API has a scope configuration that forces you to restrict the programs and arguments that can be used.
+ *
+ * ### Restricting access to the {@link open | `open`} API
+ *
+ * On the configuration object, `open: true` means that the {@link open} API can be used with any URL,
+ * as the argument is validated with the `^((mailto:\w+)|(tel:\w+)|(https?://\w+)).+` regex.
+ * You can change that regex by changing the boolean value to a string, e.g. `open: ^https://github.com/`.
+ *
+ * ### Restricting access to the {@link Command | `Command`} APIs
+ *
+ * The plugin configuration object has a `scope` field that defines an array of CLIs that can be used.
+ * Each CLI is a configuration object `{ name: string, cmd: string, sidecar?: bool, args?: boolean | Arg[] }`.
+ *
+ * - `name`: the unique identifier of the command, passed to the {@link Command.create | Command.create function}.
+ * If it's a sidecar, this must be the value defined on `tauri.conf.json > tauri > bundle > externalBin`.
+ * - `cmd`: the program that is executed on this configuration. If it's a sidecar, this value is ignored.
+ * - `sidecar`: whether the object configures a sidecar or a system program.
+ * - `args`: the arguments that can be passed to the program. By default no arguments are allowed.
+ *   - `true` means that any argument list is allowed.
+ *   - `false` means that no arguments are allowed.
+ *   - otherwise an array can be configured. Each item is either a string representing the fixed argument value
+ *     or a `{ validator: string }` that defines a regex validating the argument value.
+ *
+ * #### Example scope configuration
+ *
+ * CLI: `git commit -m "the commit message"`
+ *
+ * Configuration:
+ * ```json
+ * {
+ *   "plugins": {
+ *     "shell": {
+ *       "scope": [
+ *         {
+ *           "name": "run-git-commit",
+ *           "cmd": "git",
+ *           "args": ["commit", "-m", { "validator": "\\S+" }]
+ *         }
+ *       ]
+ *     }
+ *   }
+ * }
+ * ```
+ * Usage:
+ * ```typescript
+ * import { Command } from '@tauri-apps/plugin-shell'
+ * Command.create('run-git-commit', ['commit', '-m', 'the commit message'])
+ * ```
+ *
+ * Trying to execute any API with a program not configured on the scope results in a promise rejection due to denied access.
+ *
+ * @module
+ */
 /**
  * Spawns a process.
  *
  * @ignore
  * @param program The name of the scoped command.
- * @param onEvent Event handler.
+ * @param onEventHandler Event handler.
  * @param args Program arguments.
  * @param options Configuration for the process spawn.
  * @returns A promise resolving to the process id.
  *
  * @since 2.0.0
  */
-async function execute(onEvent, program, args = [], options) {
+async function execute(onEventHandler, program, args = [], options) {
     if (typeof args === "object") {
         Object.freeze(args);
     }
-    return window.__TAURI_INVOKE__("plugin:shell|execute", {
+    const onEvent = new Channel();
+    onEvent.onmessage = onEventHandler;
+    return invoke("plugin:shell|execute", {
         program,
         args,
         options,
-        onEventFn: window.__TAURI__.transformCallback(onEvent),
+        onEvent,
     });
 }
 /**
@@ -213,7 +276,7 @@ class Child {
      * @since 2.0.0
      */
     async write(data) {
-        return window.__TAURI_INVOKE__("plugin:shell|stdin_write", {
+        return invoke("plugin:shell|stdin_write", {
             pid: this.pid,
             // correctly serialize Uint8Arrays
             buffer: typeof data === "string" ? data : Array.from(data),
@@ -227,7 +290,7 @@ class Child {
      * @since 2.0.0
      */
     async kill() {
-        return window.__TAURI_INVOKE__("plugin:shell|kill", {
+        return invoke("plugin:shell|kill", {
             cmd: "killChild",
             pid: this.pid,
         });
@@ -408,7 +471,7 @@ class Command extends EventEmitter {
  * @since 2.0.0
  */
 async function open(path, openWith) {
-    return window.__TAURI_INVOKE__("plugin:shell|open", {
+    return invoke("plugin:shell|open", {
         path,
         with: openWith,
     });

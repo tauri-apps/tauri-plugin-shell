@@ -1,99 +1,6 @@
-/******************************************************************************
-Copyright (c) Microsoft Corporation.
+'use strict';
 
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
-***************************************************************************** */
-/* global Reflect, Promise, SuppressedError, Symbol */
-
-
-function __classPrivateFieldGet(receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-}
-
-function __classPrivateFieldSet(receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-}
-
-typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
-    var e = new Error(message);
-    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
-};
-
-// Copyright 2019-2023 Tauri Programme within The Commons Conservancy
-// SPDX-License-Identifier: Apache-2.0
-// SPDX-License-Identifier: MIT
-var _Channel_onmessage;
-/**
- * Invoke your custom commands.
- *
- * This package is also accessible with `window.__TAURI__.tauri` when [`build.withGlobalTauri`](https://tauri.app/v1/api/config/#buildconfig.withglobaltauri) in `tauri.conf.json` is set to `true`.
- * @module
- */
-/**
- * Transforms a callback function to a string identifier that can be passed to the backend.
- * The backend uses the identifier to `eval()` the callback.
- *
- * @return A unique identifier associated with the callback function.
- *
- * @since 1.0.0
- */
-function transformCallback(callback, once = false) {
-    return window.__TAURI_INTERNALS__.transformCallback(callback, once);
-}
-class Channel {
-    constructor() {
-        // @ts-expect-error field used by the IPC serializer
-        this.__TAURI_CHANNEL_MARKER__ = true;
-        _Channel_onmessage.set(this, () => {
-            // no-op
-        });
-        this.id = transformCallback((response) => {
-            __classPrivateFieldGet(this, _Channel_onmessage, "f").call(this, response);
-        });
-    }
-    set onmessage(handler) {
-        __classPrivateFieldSet(this, _Channel_onmessage, handler, "f");
-    }
-    get onmessage() {
-        return __classPrivateFieldGet(this, _Channel_onmessage, "f");
-    }
-    toJSON() {
-        return `__CHANNEL__:${this.id}`;
-    }
-}
-_Channel_onmessage = new WeakMap();
-/**
- * Sends a message to the backend.
- * @example
- * ```typescript
- * import { invoke } from '@tauri-apps/api/primitives';
- * await invoke('login', { user: 'tauri', password: 'poiwe3h4r5ip3yrhtew9ty' });
- * ```
- *
- * @param cmd The command name.
- * @param args The optional arguments to pass to the command.
- * @param options The request options.
- * @return A promise resolving or rejecting to the backend response.
- *
- * @since 1.0.0
- */
-async function invoke(cmd, args = {}, options) {
-    return window.__TAURI_INTERNALS__.invoke(cmd, args, options);
-}
+var primitives = require('@tauri-apps/api/primitives');
 
 // Copyright 2019-2023 Tauri Programme within The Commons Conservancy
 // SPDX-License-Identifier: Apache-2.0
@@ -173,9 +80,9 @@ async function execute(onEventHandler, program, args = [], options) {
     if (typeof args === "object") {
         Object.freeze(args);
     }
-    const onEvent = new Channel();
+    const onEvent = new primitives.Channel();
     onEvent.onmessage = onEventHandler;
-    return invoke("plugin:shell|execute", {
+    return primitives.invoke("plugin:shell|execute", {
         program,
         args,
         options,
@@ -371,7 +278,7 @@ class Child {
      * @since 2.0.0
      */
     async write(data) {
-        return invoke("plugin:shell|stdin_write", {
+        return primitives.invoke("plugin:shell|stdin_write", {
             pid: this.pid,
             // correctly serialize Uint8Arrays
             buffer: typeof data === "string" ? data : Array.from(data),
@@ -385,7 +292,7 @@ class Child {
      * @since 2.0.0
      */
     async kill() {
-        return invoke("plugin:shell|kill", {
+        return primitives.invoke("plugin:shell|kill", {
             cmd: "killChild",
             pid: this.pid,
         });
@@ -430,7 +337,7 @@ class Command extends EventEmitter {
         this.stderr = new EventEmitter();
         this.program = program;
         this.args = typeof args === "string" ? [args] : args;
-        this.options = options !== null && options !== void 0 ? options : {};
+        this.options = options ?? {};
     }
     /**
      * Creates a command to execute the given program.
@@ -566,11 +473,13 @@ class Command extends EventEmitter {
  * @since 2.0.0
  */
 async function open(path, openWith) {
-    return invoke("plugin:shell|open", {
+    return primitives.invoke("plugin:shell|open", {
         path,
         with: openWith,
     });
 }
 
-export { Child, Command, EventEmitter, open };
-//# sourceMappingURL=index.min.js.map
+exports.Child = Child;
+exports.Command = Command;
+exports.EventEmitter = EventEmitter;
+exports.open = open;

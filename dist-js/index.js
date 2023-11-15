@@ -335,7 +335,7 @@ class Command extends EventEmitter {
         this.stderr = new EventEmitter();
         this.program = program;
         this.args = typeof args === "string" ? [args] : args;
-        this.options = options !== null && options !== void 0 ? options : {};
+        this.options = options ?? {};
     }
     /**
      * Creates a command to execute the given program.
@@ -478,4 +478,3 @@ async function open(path, openWith) {
 }
 
 export { Child, Command, EventEmitter, open };
-//# sourceMappingURL=index.mjs.map

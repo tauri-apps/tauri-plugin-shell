@@ -1,6 +1,6 @@
 'use strict';
 
-var primitives = require('@tauri-apps/api/primitives');
+var core = require('@tauri-apps/api/core');
 
 // Copyright 2019-2023 Tauri Programme within The Commons Conservancy
 // SPDX-License-Identifier: Apache-2.0
@@ -80,9 +80,9 @@ async function execute(onEventHandler, program, args = [], options) {
     if (typeof args === "object") {
         Object.freeze(args);
     }
-    const onEvent = new primitives.Channel();
+    const onEvent = new core.Channel();
     onEvent.onmessage = onEventHandler;
-    return primitives.invoke("plugin:shell|execute", {
+    return core.invoke("plugin:shell|execute", {
         program,
         args,
         options,
@@ -278,7 +278,7 @@ class Child {
      * @since 2.0.0
      */
     async write(data) {
-        return primitives.invoke("plugin:shell|stdin_write", {
+        return core.invoke("plugin:shell|stdin_write", {
             pid: this.pid,
             // correctly serialize Uint8Arrays
             buffer: typeof data === "string" ? data : Array.from(data),
@@ -292,7 +292,7 @@ class Child {
      * @since 2.0.0
      */
     async kill() {
-        return primitives.invoke("plugin:shell|kill", {
+        return core.invoke("plugin:shell|kill", {
             cmd: "killChild",
             pid: this.pid,
         });
@@ -473,7 +473,7 @@ class Command extends EventEmitter {
  * @since 2.0.0
  */
 async function open(path, openWith) {
-    return primitives.invoke("plugin:shell|open", {
+    return core.invoke("plugin:shell|open", {
         path,
         with: openWith,
     });

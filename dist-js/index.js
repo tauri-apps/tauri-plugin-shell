@@ -80,7 +80,7 @@ async function execute(onEventHandler, program, args = [], options) {
     }
     const onEvent = new Channel();
     onEvent.onmessage = onEventHandler;
-    return invoke("plugin:shell|execute", {
+    return await invoke("plugin:shell|execute", {
         program,
         args,
         options,
@@ -171,6 +171,7 @@ class EventEmitter {
      * @since 2.0.0
      */
     removeAllListeners(event) {
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (event) {
             // eslint-disable-next-line @typescript-eslint/no-dynamic-delete,security/detect-object-injection
             delete this.eventListeners[event];
@@ -276,7 +277,7 @@ class Child {
      * @since 2.0.0
      */
     async write(data) {
-        return invoke("plugin:shell|stdin_write", {
+        await invoke("plugin:shell|stdin_write", {
             pid: this.pid,
             // correctly serialize Uint8Arrays
             buffer: typeof data === "string" ? data : Array.from(data),
@@ -290,7 +291,7 @@ class Child {
      * @since 2.0.0
      */
     async kill() {
-        return invoke("plugin:shell|kill", {
+        await invoke("plugin:shell|kill", {
             cmd: "killChild",
             pid: this.pid,
         });
@@ -377,7 +378,7 @@ class Command extends EventEmitter {
      * @since 2.0.0
      */
     async spawn() {
-        return execute((event) => {
+        return await execute((event) => {
             switch (event.event) {
                 case "Error":
                     this.emit("error", event.payload);
@@ -411,7 +412,7 @@ class Command extends EventEmitter {
      * @since 2.0.0
      */
     async execute() {
-        return new Promise((resolve, reject) => {
+        return await new Promise((resolve, reject) => {
             this.on("error", reject);
             const stdout = [];
             const stderr = [];
@@ -471,7 +472,7 @@ class Command extends EventEmitter {
  * @since 2.0.0
  */
 async function open(path, openWith) {
-    return invoke("plugin:shell|open", {
+    await invoke("plugin:shell|open", {
         path,
         with: openWith,
     });

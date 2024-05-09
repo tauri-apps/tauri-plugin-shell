@@ -65,31 +65,6 @@ var core = require('@tauri-apps/api/core');
  * @module
  */
 /**
- * Spawns a process.
- *
- * @ignore
- * @param program The name of the scoped command.
- * @param onEventHandler Event handler.
- * @param args Program arguments.
- * @param options Configuration for the process spawn.
- * @returns A promise resolving to the process id.
- *
- * @since 2.0.0
- */
-async function execute(onEventHandler, program, args = [], options) {
-    if (typeof args === "object") {
-        Object.freeze(args);
-    }
-    const onEvent = new core.Channel();
-    onEvent.onmessage = onEventHandler;
-    return await core.invoke("plugin:shell|execute", {
-        program,
-        args,
-        options,
-        onEvent,
-    });
-}
-/**
  * @since 2.0.0
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -380,7 +355,14 @@ class Command extends EventEmitter {
      * @since 2.0.0
      */
     async spawn() {
-        return await execute((event) => {
+        const program = this.program;
+        const args = this.args;
+        const options = this.options;
+        if (typeof args === "object") {
+            Object.freeze(args);
+        }
+        const onEvent = new core.Channel();
+        onEvent.onmessage = (event) => {
             switch (event.event) {
                 case "Error":
                     this.emit("error", event.payload);
@@ -395,7 +377,13 @@ class Command extends EventEmitter {
                     this.stderr.emit("data", event.payload);
                     break;
             }
-        }, this.program, this.args, this.options).then((pid) => new Child(pid));
+        };
+        return await core.invoke("plugin:shell|spawn", {
+            program,
+            args,
+            options,
+            onEvent,
+        }).then((pid) => new Child(pid));
     }
     /**
      * Executes the command as a child process, waiting for it to finish and collecting all of its output.
@@ -414,37 +402,17 @@ class Command extends EventEmitter {
      * @since 2.0.0
      */
     async execute() {
-        return await new Promise((resolve, reject) => {
-            this.on("error", reject);
-            const stdout = [];
-            const stderr = [];
-            this.stdout.on("data", (line) => {
-                stdout.push(line);
-            });
-            this.stderr.on("data", (line) => {
-                stderr.push(line);
-            });
-            this.on("close", (payload) => {
-                resolve({
-                    code: payload.code,
-                    signal: payload.signal,
-                    stdout: this.collectOutput(stdout),
-                    stderr: this.collectOutput(stderr),
-                });
-            });
-            this.spawn().catch(reject);
+        const program = this.program;
+        const args = this.args;
+        const options = this.options;
+        if (typeof args === "object") {
+            Object.freeze(args);
+        }
+        return await core.invoke("plugin:shell|execute", {
+            program,
+            args,
+            options,
         });
-    }
-    /** @ignore */
-    collectOutput(events) {
-        if (this.options.encoding === "raw") {
-            return events.reduce((p, c) => {
-                return new Uint8Array([...p, ...c, 10]);
-            }, new Uint8Array());
-        }
-        else {
-            return events.join("\n");
-        }
     }
 }
 /**

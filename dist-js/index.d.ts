@@ -234,8 +234,6 @@ declare class Command<O extends IOPayload> extends EventEmitter<CommandEvents> {
      * @since 2.0.0
      */
     execute(): Promise<ChildProcess<O>>;
-    /** @ignore */
-    private collectOutput;
 }
 /**
  * Payload for the `Terminated` command event.

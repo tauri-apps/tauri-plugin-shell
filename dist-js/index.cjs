@@ -122,7 +122,6 @@ class EventEmitter {
     once(eventName, listener) {
         const wrapper = (arg) => {
             this.removeListener(eventName, wrapper);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             listener(arg);
         };
         return this.addListener(eventName, wrapper);
@@ -148,9 +147,8 @@ class EventEmitter {
      * @since 2.0.0
      */
     removeAllListeners(event) {
-        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (event) {
-            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete,security/detect-object-injection
+            // eslint-disable-next-line security/detect-object-injection
             delete this.eventListeners[event];
         }
         else {
@@ -170,9 +168,8 @@ class EventEmitter {
      */
     emit(eventName, arg) {
         if (eventName in this.eventListeners) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,security/detect-object-injection
+            // eslint-disable-next-line security/detect-object-injection
             const listeners = this.eventListeners[eventName];
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             for (const listener of listeners)
                 listener(arg);
             return true;

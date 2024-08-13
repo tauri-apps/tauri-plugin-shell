@@ -19,7 +19,7 @@ import { invoke, Channel } from '@tauri-apps/api/core';
  *
  * ### Restricting access to the {@link Command | `Command`} APIs
  *
- * The plugin configuration object has a `scope` field that defines an array of CLIs that can be used.
+ * The plugin permissions object has a `scope` field that defines an array of CLIs that can be used.
  * Each CLI is a configuration object `{ name: string, cmd: string, sidecar?: bool, args?: boolean | Arg[] }`.
  *
  * - `name`: the unique identifier of the command, passed to the {@link Command.create | Command.create function}.
@@ -36,12 +36,13 @@ import { invoke, Channel } from '@tauri-apps/api/core';
  *
  * CLI: `git commit -m "the commit message"`
  *
- * Configuration:
+ * Capability:
  * ```json
  * {
- *   "plugins": {
- *     "shell": {
- *       "scope": [
+ *   "permissions": [
+ *     {
+ *       "identifier": "shell:allow-execute",
+ *       "allow": [
  *         {
  *           "name": "run-git-commit",
  *           "cmd": "git",
@@ -49,7 +50,7 @@ import { invoke, Channel } from '@tauri-apps/api/core';
  *         }
  *       ]
  *     }
- *   }
+ *   ]
  * }
  * ```
  * Usage:

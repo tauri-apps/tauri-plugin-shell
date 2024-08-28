@@ -252,8 +252,7 @@ class Child {
     async write(data) {
         await invoke("plugin:shell|stdin_write", {
             pid: this.pid,
-            // correctly serialize Uint8Arrays
-            buffer: typeof data === "string" ? data : Array.from(data),
+            buffer: data,
         });
     }
     /**

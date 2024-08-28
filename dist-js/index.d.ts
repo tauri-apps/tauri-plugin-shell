@@ -140,7 +140,7 @@ declare class Child {
      *
      * @since 2.0.0
      */
-    write(data: IOPayload): Promise<void>;
+    write(data: IOPayload | number[]): Promise<void>;
     /**
      * Kills the child process.
      *

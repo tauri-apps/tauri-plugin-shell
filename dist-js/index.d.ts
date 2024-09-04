@@ -201,12 +201,12 @@ declare class Command<O extends IOPayload> extends EventEmitter<CommandEvents> {
     private constructor();
     static create(program: string, args?: string | string[]): Command<string>;
     static create(program: string, args?: string | string[], options?: SpawnOptions & {
-        encoding: "raw";
+        encoding: 'raw';
     }): Command<Uint8Array>;
     static create(program: string, args?: string | string[], options?: SpawnOptions): Command<string>;
     static sidecar(program: string, args?: string | string[]): Command<string>;
     static sidecar(program: string, args?: string | string[], options?: SpawnOptions & {
-        encoding: "raw";
+        encoding: 'raw';
     }): Command<Uint8Array>;
     static sidecar(program: string, args?: string | string[], options?: SpawnOptions): Command<string>;
     /**
@@ -274,4 +274,4 @@ type IOPayload = string | Uint8Array;
  */
 declare function open(path: string, openWith?: string): Promise<void>;
 export { Command, Child, EventEmitter, open };
-export type { IOPayload, CommandEvents, TerminatedPayload, OutputEvents, ChildProcess, SpawnOptions, };
+export type { IOPayload, CommandEvents, TerminatedPayload, OutputEvents, ChildProcess, SpawnOptions };

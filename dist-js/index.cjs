@@ -252,9 +252,9 @@ class Child {
      * @since 2.0.0
      */
     async write(data) {
-        await core.invoke("plugin:shell|stdin_write", {
+        await core.invoke('plugin:shell|stdin_write', {
             pid: this.pid,
-            buffer: data,
+            buffer: data
         });
     }
     /**
@@ -265,9 +265,9 @@ class Child {
      * @since 2.0.0
      */
     async kill() {
-        await core.invoke("plugin:shell|kill", {
-            cmd: "killChild",
-            pid: this.pid,
+        await core.invoke('plugin:shell|kill', {
+            cmd: 'killChild',
+            pid: this.pid
         });
     }
 }
@@ -309,7 +309,7 @@ class Command extends EventEmitter {
         /** Event emitter for the `stderr`. Emits the `data` event. */
         this.stderr = new EventEmitter();
         this.program = program;
-        this.args = typeof args === "string" ? [args] : args;
+        this.args = typeof args === 'string' ? [args] : args;
         this.options = options ?? {};
     }
     /**
@@ -355,31 +355,31 @@ class Command extends EventEmitter {
         const program = this.program;
         const args = this.args;
         const options = this.options;
-        if (typeof args === "object") {
+        if (typeof args === 'object') {
             Object.freeze(args);
         }
         const onEvent = new core.Channel();
         onEvent.onmessage = (event) => {
             switch (event.event) {
-                case "Error":
-                    this.emit("error", event.payload);
+                case 'Error':
+                    this.emit('error', event.payload);
                     break;
-                case "Terminated":
-                    this.emit("close", event.payload);
+                case 'Terminated':
+                    this.emit('close', event.payload);
                     break;
-                case "Stdout":
-                    this.stdout.emit("data", event.payload);
+                case 'Stdout':
+                    this.stdout.emit('data', event.payload);
                     break;
-                case "Stderr":
-                    this.stderr.emit("data", event.payload);
+                case 'Stderr':
+                    this.stderr.emit('data', event.payload);
                     break;
             }
         };
-        return await core.invoke("plugin:shell|spawn", {
+        return await core.invoke('plugin:shell|spawn', {
             program,
             args,
             options,
-            onEvent,
+            onEvent
         }).then((pid) => new Child(pid));
     }
     /**
@@ -402,13 +402,13 @@ class Command extends EventEmitter {
         const program = this.program;
         const args = this.args;
         const options = this.options;
-        if (typeof args === "object") {
+        if (typeof args === 'object') {
             Object.freeze(args);
         }
-        return await core.invoke("plugin:shell|execute", {
+        return await core.invoke('plugin:shell|execute', {
             program,
             args,
-            options,
+            options
         });
     }
 }
@@ -439,9 +439,9 @@ class Command extends EventEmitter {
  * @since 2.0.0
  */
 async function open(path, openWith) {
-    await core.invoke("plugin:shell|open", {
+    await core.invoke('plugin:shell|open', {
         path,
-        with: openWith,
+        with: openWith
     });
 }
 

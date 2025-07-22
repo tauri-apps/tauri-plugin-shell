@@ -298,7 +298,7 @@ class Command extends EventEmitter {
      * Creates a new `Command` instance.
      *
      * @param program The program name to execute.
-     * It must be configured on `tauri.conf.json > plugins > shell > scope`.
+     * It must be configured in your project's capabilities.
      * @param args Program arguments.
      * @param options Spawn options.
      */
@@ -322,7 +322,7 @@ class Command extends EventEmitter {
      * ```
      *
      * @param program The program to execute.
-     * It must be configured on `tauri.conf.json > plugins > shell > scope`.
+     * It must be configured in your project's capabilities.
      */
     static create(program, args = [], options) {
         return new Command(program, args, options);
@@ -337,7 +337,7 @@ class Command extends EventEmitter {
      * ```
      *
      * @param program The program to execute.
-     * It must be configured on `tauri.conf.json > plugins > shell > scope`.
+     * It must be configured in your project's capabilities.
      */
     static sidecar(program, args = [], options) {
         const instance = new Command(program, args, options);

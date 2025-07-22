@@ -194,7 +194,7 @@ declare class Command<O extends IOPayload> extends EventEmitter<CommandEvents> {
      * Creates a new `Command` instance.
      *
      * @param program The program name to execute.
-     * It must be configured on `tauri.conf.json > plugins > shell > scope`.
+     * It must be configured in your project's capabilities.
      * @param args Program arguments.
      * @param options Spawn options.
      */

@@ -64,6 +64,9 @@ import { invoke, Channel } from '@tauri-apps/api/core';
  * @module
  */
 /**
+ * A minimal event emitter modeled after Node.js' `EventEmitter`, used by
+ * {@link Command} and by its `stdout` and `stderr` streams.
+ *
  * @since 2.0.0
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -76,6 +79,18 @@ class EventEmitter {
     /**
      * Alias for `emitter.on(eventName, listener)`.
      *
+     * @example
+     * ```typescript
+     * import { Command } from '@tauri-apps/plugin-shell';
+     * const command = Command.create('node');
+     * command.addListener('error', (error) => console.error(error));
+     * ```
+     *
+     * @param eventName The name of the event to listen to.
+     * @param listener The callback invoked with the event payload.
+     *
+     * @returns A reference to the `EventEmitter`, so that calls can be chained.
+     *
      * @since 2.0.0
      */
     addListener(eventName, listener) {
@@ -83,6 +98,20 @@ class EventEmitter {
     }
     /**
      * Alias for `emitter.off(eventName, listener)`.
+     *
+     * @example
+     * ```typescript
+     * import { Command } from '@tauri-apps/plugin-shell';
+     * const command = Command.create('node');
+     * const listener = (error: string) => console.error(error);
+     * command.addListener('error', listener);
+     * command.removeListener('error', listener);
+     * ```
+     *
+     * @param eventName The name of the event to stop listening to.
+     * @param listener The exact callback that was registered before.
+     *
+     * @returns A reference to the `EventEmitter`, so that calls can be chained.
      *
      * @since 2.0.0
      */
@@ -96,6 +125,20 @@ class EventEmitter {
      * times.
      *
      * Returns a reference to the `EventEmitter`, so that calls can be chained.
+     *
+     * @example
+     * ```typescript
+     * import { Command } from '@tauri-apps/plugin-shell';
+     * const command = Command.create('node');
+     * command.on('close', (data) => {
+     *   console.log(`command finished with code ${data.code}`);
+     * });
+     * ```
+     *
+     * @param eventName The name of the event to listen to.
+     * @param listener The callback invoked with the event payload.
+     *
+     * @returns A reference to the `EventEmitter`, so that calls can be chained.
      *
      * @since 2.0.0
      */
@@ -116,6 +159,20 @@ class EventEmitter {
      *
      * Returns a reference to the `EventEmitter`, so that calls can be chained.
      *
+     * @example
+     * ```typescript
+     * import { Command } from '@tauri-apps/plugin-shell';
+     * const command = Command.create('node');
+     * command.once('close', (data) => {
+     *   console.log(`command finished with code ${data.code}`);
+     * });
+     * ```
+     *
+     * @param eventName The name of the event to listen to once.
+     * @param listener The callback invoked with the event payload.
+     *
+     * @returns A reference to the `EventEmitter`, so that calls can be chained.
+     *
      * @since 2.0.0
      */
     once(eventName, listener) {
@@ -128,6 +185,20 @@ class EventEmitter {
     /**
      * Removes the all specified listener from the listener array for the event eventName
      * Returns a reference to the `EventEmitter`, so that calls can be chained.
+     *
+     * @example
+     * ```typescript
+     * import { Command } from '@tauri-apps/plugin-shell';
+     * const command = Command.create('node');
+     * const listener = (error: string) => console.error(error);
+     * command.on('error', listener);
+     * command.off('error', listener);
+     * ```
+     *
+     * @param eventName The name of the event to stop listening to.
+     * @param listener The exact callback that was registered before.
+     *
+     * @returns A reference to the `EventEmitter`, so that calls can be chained.
      *
      * @since 2.0.0
      */
@@ -143,6 +214,19 @@ class EventEmitter {
      *
      * Returns a reference to the `EventEmitter`, so that calls can be chained.
      *
+     * @example
+     * ```typescript
+     * import { Command } from '@tauri-apps/plugin-shell';
+     * const command = Command.create('node');
+     * command.on('error', (error) => console.error(error));
+     * command.removeAllListeners('error');
+     * ```
+     *
+     * @param event The name of the event to remove the listeners of.
+     * When omitted, the listeners of every event are removed.
+     *
+     * @returns A reference to the `EventEmitter`, so that calls can be chained.
+     *
      * @since 2.0.0
      */
     removeAllListeners(event) {
@@ -157,9 +241,22 @@ class EventEmitter {
         return this;
     }
     /**
-     * @ignore
-     * Synchronously calls each of the listeners registered for the event named`eventName`, in the order they were registered, passing the supplied arguments
+     * Synchronously calls each of the listeners registered for the event named
+     * `eventName`, in the order they were registered, passing the supplied arguments
      * to each.
+     *
+     * @ignore
+     *
+     * @example
+     * ```typescript
+     * import { EventEmitter } from '@tauri-apps/plugin-shell';
+     * const emitter = new EventEmitter<{ data: string }>();
+     * emitter.on('data', (line) => console.log(line));
+     * emitter.emit('data', 'hello');
+     * ```
+     *
+     * @param eventName The name of the event to emit.
+     * @param arg The payload passed to every registered listener.
      *
      * @returns `true` if the event had listeners, `false` otherwise.
      *
@@ -178,6 +275,18 @@ class EventEmitter {
     /**
      * Returns the number of listeners listening to the event named `eventName`.
      *
+     * @example
+     * ```typescript
+     * import { Command } from '@tauri-apps/plugin-shell';
+     * const command = Command.create('node');
+     * command.on('close', () => {});
+     * console.log(command.listenerCount('close')); // 1
+     * ```
+     *
+     * @param eventName The name of the event to count the listeners of.
+     *
+     * @returns The number of listeners registered for the given event.
+     *
      * @since 2.0.0
      */
     listenerCount(eventName) {
@@ -193,6 +302,18 @@ class EventEmitter {
      * times.
      *
      * Returns a reference to the `EventEmitter`, so that calls can be chained.
+     *
+     * @example
+     * ```typescript
+     * import { Command } from '@tauri-apps/plugin-shell';
+     * const command = Command.create('node');
+     * command.prependListener('error', (error) => console.error(error));
+     * ```
+     *
+     * @param eventName The name of the event to listen to.
+     * @param listener The callback invoked with the event payload.
+     *
+     * @returns A reference to the `EventEmitter`, so that calls can be chained.
      *
      * @since 2.0.0
      */
@@ -213,6 +334,18 @@ class EventEmitter {
      *
      * Returns a reference to the `EventEmitter`, so that calls can be chained.
      *
+     * @example
+     * ```typescript
+     * import { Command } from '@tauri-apps/plugin-shell';
+     * const command = Command.create('node');
+     * command.prependOnceListener('error', (error) => console.error(error));
+     * ```
+     *
+     * @param eventName The name of the event to listen to once.
+     * @param listener The callback invoked with the event payload.
+     *
+     * @returns A reference to the `EventEmitter`, so that calls can be chained.
+     *
      * @since 2.0.0
      */
     prependOnceListener(eventName, listener) {
@@ -226,9 +359,27 @@ class EventEmitter {
     }
 }
 /**
+ * A handle to a child process spawned with {@link Command.spawn},
+ * which can be used to write to its `stdin` or to kill it.
+ *
  * @since 2.0.0
  */
 class Child {
+    /**
+     * Creates a handle to the child process with the given process id.
+     *
+     * @example
+     * ```typescript
+     * import { Command } from '@tauri-apps/plugin-shell';
+     * // a `Child` is usually obtained by spawning a command:
+     * const child = await Command.create('node').spawn();
+     * console.log(child.pid);
+     * ```
+     *
+     * @param pid The process id of the child process.
+     *
+     * @since 2.0.0
+     */
     constructor(pid) {
         this.pid = pid;
     }
@@ -257,6 +408,14 @@ class Child {
     }
     /**
      * Kills the child process.
+     *
+     * @example
+     * ```typescript
+     * import { Command } from '@tauri-apps/plugin-shell';
+     * const command = Command.create('node');
+     * const child = await command.spawn();
+     * await child.kill();
+     * ```
      *
      * @returns A promise indicating the success or failure of the operation.
      *
@@ -312,30 +471,33 @@ class Command extends EventEmitter {
     }
     /**
      * Creates a command to execute the given program.
-     * @example
-     * ```typescript
-     * import { Command } from '@tauri-apps/plugin-shell';
-     * const command = Command.create('my-app', ['run', 'tauri']);
-     * const output = await command.execute();
-     * ```
      *
      * @param program The program to execute.
      * It must be configured in your project's capabilities.
+     * @param args The arguments to pass to the program. Defaults to no arguments.
+     * @param options Spawn options such as the working directory, the environment
+     * variables and the character encoding of the process output.
+     *
+     * @returns The command instance, ready to be spawned or executed.
+     *
+     * @since 2.0.0
      */
     static create(program, args = [], options) {
         return new Command(program, args, options);
     }
     /**
      * Creates a command to execute the given sidecar program.
-     * @example
-     * ```typescript
-     * import { Command } from '@tauri-apps/plugin-shell';
-     * const command = Command.sidecar('my-sidecar');
-     * const output = await command.execute();
-     * ```
      *
-     * @param program The program to execute.
-     * It must be configured in your project's capabilities.
+     * @param program The sidecar program to execute.
+     * It must be configured in your project's capabilities
+     * and defined on `tauri.conf.json > bundle > externalBin`.
+     * @param args The arguments to pass to the program. Defaults to no arguments.
+     * @param options Spawn options such as the working directory, the environment
+     * variables and the character encoding of the process output.
+     *
+     * @returns The command instance, ready to be spawned or executed.
+     *
+     * @since 2.0.0
      */
     static sidecar(program, args = [], options) {
         const instance = new Command(program, args, options);
@@ -344,6 +506,15 @@ class Command extends EventEmitter {
     }
     /**
      * Executes the command as a child process, returning a handle to it.
+     *
+     * @example
+     * ```typescript
+     * import { Command } from '@tauri-apps/plugin-shell';
+     * const command = Command.create('node');
+     * command.stdout.on('data', (line) => console.log(line));
+     * const child = await command.spawn();
+     * console.log('pid:', child.pid);
+     * ```
      *
      * @returns A promise resolving to the child process handle.
      *

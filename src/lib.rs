@@ -19,8 +19,8 @@ use std::{
 use process::{Command, CommandChild};
 use regex::Regex;
 use tauri::{
-    plugin::{Builder, TauriPlugin},
     AppHandle, Manager, RunEvent, Runtime,
+    plugin::{Builder, TauriPlugin},
 };
 
 mod commands;
